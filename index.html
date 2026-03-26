@@ -1133,8 +1133,8 @@ function renderRoster() {
 // ── AUDIO ─────────────────────────────────────────────────────────────────────
 function getAudioUrl(t) {
   if (t.recording && t.recording.startsWith('http')) return t.recording;
-  if (t.drive_file_id) return `https://drive.google.com/uc?export=download&id=${t.drive_file_id}`;
-  if (t.recording) return `https://drive.google.com/uc?export=download&id=${t.recording}`;
+  if (t.drive_file_id) return `https://drive.google.com/file/d/${t.drive_file_id}/preview`;
+  if (t.recording) return `https://drive.google.com/file/d/${t.recording}/preview`;
   return '';
 }
 function getDownloadUrl(t) {
