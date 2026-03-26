@@ -1,0 +1,1618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Voice Talent Review — Foreground Recordings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+/* ── RESET & VARIABLES ───────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* Dark mode — lime accent */
+  --lime:       #B8F04A;
+  --lime-dim:   #94c238;
+  --lime-glow:  rgba(184,240,74,0.18);
+  --lime-soft:  rgba(184,240,74,0.08);
+  /* Accent aliases — dark mode maps to lime */
+  --accent:        #B8F04A;
+  --accent-dim:    #94c238;
+  --accent-glow:   rgba(184,240,74,0.18);
+  --accent-soft:   rgba(184,240,74,0.08);
+  --accent-text:   #000;          /* text on accent bg */
+  /* Secondary accent (pink, for supporting role etc.) */
+  --pink:       #E8407A;
+  --pink-soft:  rgba(232,64,122,0.1);
+  /* Bordeaux */
+  --bordeaux:   #7B1B38;
+  --bordeaux-soft: rgba(123,27,56,0.12);
+  /* Surfaces */
+  --bg:         #0a0a0a;
+  --bg2:        #111111;
+  --bg3:        #181818;
+  --border:     rgba(255,255,255,0.07);
+  --border-hi:  rgba(255,255,255,0.14);
+  --text:       #f0f0f0;
+  --text2:      #999;
+  --text3:      #555;
+  --card-bg:    #141414;
+  --modal-bg:   #0f0f0f;
+  --radius:     14px;
+  --radius-sm:  8px;
+  font-size: 15px;
+}
+
+.light {
+  /* Light mode — swap lime for Invisible blue, use pink + bordeaux */
+  --accent:        #1A56F0;        /* Invisible cobalt blue */
+  --accent-dim:    #1440c4;
+  --accent-glow:   rgba(26,86,240,0.14);
+  --accent-soft:   rgba(26,86,240,0.07);
+  --accent-text:   #ffffff;
+  --pink:          #C4175A;        /* deeper pink, readable on white */
+  --pink-soft:     rgba(196,23,90,0.08);
+  --bordeaux:      #7B1B38;
+  --bordeaux-soft: rgba(123,27,56,0.1);
+  /* Keep lime vars pointing to blue so any leftover lime refs still look ok */
+  --lime:          #1A56F0;
+  --lime-dim:      #1440c4;
+  --lime-glow:     rgba(26,86,240,0.14);
+  --lime-soft:     rgba(26,86,240,0.07);
+  /* Surfaces */
+  --bg:        #f4f5f9;
+  --bg2:       #eceef5;
+  --bg3:       #e2e5ef;
+  --border:    rgba(0,0,0,0.08);
+  --border-hi: rgba(0,0,0,0.15);
+  --text:      #0e1118;
+  --text2:     #555c6e;
+  --text3:     #9ba0ae;
+  --card-bg:   #ffffff;
+  --modal-bg:  #fafbff;
+}
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 2px; }
+
+/* ── GRAIN OVERLAY ────────────────────────────────────────── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── HEADER ───────────────────────────────────────────────── */
+header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(10,10,10,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  display: flex; align-items: center; gap: 24px; height: 60px;
+}
+.light header { background: rgba(245,245,240,0.9); }
+
+.logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 17px; font-weight: 700;
+  color: var(--text);
+  display: flex; align-items: center; gap: 10px;
+}
+.logo-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent-glow);
+  animation: pulse-dot 2.5s ease-in-out infinite;
+  flex-shrink: 0;
+}
+@keyframes pulse-dot {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.5; transform: scale(0.7); }
+}
+
+.header-nav {
+  display: flex; gap: 4px; margin-left: auto;
+}
+.nav-btn {
+  background: none; border: none; cursor: pointer;
+  font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 500;
+  color: var(--text2); padding: 6px 14px; border-radius: 20px;
+  transition: all 0.2s;
+}
+.nav-btn:hover { color: var(--text); background: var(--border); }
+.nav-btn.active { color: var(--accent); background: var(--accent-soft); }
+
+.header-right {
+  display: flex; align-items: center; gap: 12px;
+}
+
+.mode-btn {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.18);
+  cursor: pointer;
+  height: 34px; border-radius: 20px;
+  display: flex; align-items: center; gap: 7px;
+  padding: 0 12px;
+  font-size: 12px; font-weight: 600; font-family: 'Outfit', sans-serif;
+  color: #ccc;
+  transition: all 0.2s; white-space: nowrap;
+}
+.light .mode-btn {
+  background: rgba(0,0,0,0.06);
+  border-color: rgba(0,0,0,0.18);
+  color: #555;
+}
+.mode-btn:hover { background: rgba(255,255,255,0.13); color: #fff; border-color: rgba(255,255,255,0.3); }
+.light .mode-btn:hover { background: rgba(0,0,0,0.1); color: #222; }
+
+/* ── MAIN ─────────────────────────────────────────────────── */
+main { position: relative; z-index: 1; padding: 32px; max-width: 1200px; margin: 0 auto; }
+
+/* ── HERO ─────────────────────────────────────────────────── */
+.hero {
+  margin-bottom: 40px;
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 24px;
+}
+.hero-text h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 700; line-height: 1.15;
+  margin-bottom: 8px;
+}
+.hero-text h1 em { color: var(--accent); font-style: italic; }
+.hero-text p { color: var(--text2); font-size: 14px; font-weight: 300; }
+
+/* ── STAT CARDS ───────────────────────────────────────────── */
+.stats-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
+  margin-bottom: 36px;
+}
+.stat-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px 22px;
+  position: relative; overflow: hidden;
+  transition: border-color 0.2s;
+}
+.stat-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--accent, var(--accent));
+}
+.stat-card:hover { border-color: var(--border-hi); }
+.stat-num {
+  font-size: 32px; font-weight: 700; font-family: 'Playfair Display', serif;
+  color: var(--accent, var(--accent)); line-height: 1;
+  margin-bottom: 4px;
+}
+.stat-label {
+  font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.8px; color: var(--text2);
+}
+
+/* ── FILTER BAR ───────────────────────────────────────────── */
+.filter-bar {
+  display: flex; gap: 10px; align-items: center;
+  margin-bottom: 24px; flex-wrap: wrap;
+}
+.filter-pill {
+  background: var(--card-bg); border: 1px solid var(--border);
+  color: var(--text2); font-family: 'Outfit', sans-serif;
+  font-size: 12px; font-weight: 500; padding: 6px 14px;
+  border-radius: 20px; cursor: pointer; transition: all 0.18s;
+}
+.filter-pill:hover { border-color: var(--border-hi); color: var(--text); }
+.filter-pill.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+
+.search-wrap {
+  position: relative; margin-left: auto;
+}
+.search-wrap input {
+  background: var(--card-bg); border: 1px solid var(--border);
+  color: var(--text); font-family: 'Outfit', sans-serif; font-size: 13px;
+  padding: 7px 14px 7px 34px; border-radius: 20px; width: 200px;
+  outline: none; transition: border-color 0.2s;
+}
+.search-wrap input:focus { border-color: var(--accent); }
+.search-wrap input::placeholder { color: var(--text3); }
+.search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text3); font-size: 13px; pointer-events: none; }
+
+/* ── TALENT TABLE ─────────────────────────────────────────── */
+.table-wrap {
+  background: var(--card-bg); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden;
+}
+table { width: 100%; border-collapse: collapse; }
+thead tr { border-bottom: 1px solid var(--border); }
+thead th {
+  padding: 12px 16px; text-align: left;
+  font-size: 10px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 1px; color: var(--text3);
+}
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+  cursor: pointer;
+}
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--accent-soft); }
+tbody td { padding: 14px 16px; font-size: 13px; vertical-align: middle; }
+
+.td-id { font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 600; color: var(--text3); font-variant-numeric: tabular-nums; }
+.td-name { font-weight: 600; color: var(--text); }
+.td-lang .lang-tag {
+  display: inline-block; background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 4px; padding: 2px 7px; font-size: 11px; font-weight: 500;
+}
+.td-status .status-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  border-radius: 20px; padding: 3px 10px; font-size: 11px; font-weight: 600;
+}
+.status-pill.pending    { background: var(--border);                 color: var(--text2); }
+.status-pill.finalist   { background: var(--accent-soft);            color: var(--accent); }
+.status-pill.approved   { background: rgba(52,211,153,0.15);         color: #34d399; }
+.status-pill.rejected   { background: rgba(248,113,113,0.1);         color: #f87171; }
+
+/* Role status badges — Pending / Licensed / Supporting / Rejected */
+.role-status {
+  display: inline-flex; align-items: center; gap: 4px;
+  border-radius: 20px; padding: 3px 10px; font-size: 11px; font-weight: 600;
+  white-space: nowrap;
+}
+.role-status.pending    { background: var(--border);                 color: var(--text2); }
+.role-status.licensed   { background: var(--accent-soft);            color: var(--accent);  border: 1px solid var(--accent-glow); }
+.role-status.supporting { background: var(--pink-soft);              color: var(--pink);    border: 1px solid var(--pink-soft); }
+.role-status.rejected   { background: rgba(248,113,113,0.1);         color: #f87171;        border: 1px solid rgba(248,113,113,0.2); }
+.star-icon { font-size: 13px; color: var(--text3); }
+.star-icon.filled { color: var(--accent); }
+
+.mini-play {
+  display: flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--accent-soft); border: 1px solid var(--accent);
+  color: var(--accent); font-size: 11px; cursor: pointer;
+  transition: all 0.15s;
+}
+.mini-play:hover { background: var(--accent); color: var(--accent-text); transform: scale(1.1); }
+.mini-play.playing { background: var(--accent); color: var(--accent-text); }
+
+.review-btn {
+  background: none; border: 1px solid var(--border);
+  color: var(--text2); font-family: 'Outfit', sans-serif;
+  font-size: 12px; font-weight: 500; padding: 5px 12px;
+  border-radius: 6px; cursor: pointer; transition: all 0.15s;
+}
+.review-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+.review-btn.done { border-color: var(--accent-dim); color: var(--accent-dim); }
+
+/* ── EMPTY STATE ─────────────────────────────────────────────*/
+.empty-state {
+  text-align: center; padding: 60px 24px;
+  color: var(--text2);
+}
+.empty-state svg { margin-bottom: 16px; opacity: 0.3; }
+.empty-state h3 { font-family: 'Playfair Display', serif; font-size: 18px; margin-bottom: 6px; }
+.empty-state p { font-size: 13px; color: var(--text3); }
+
+/* ── MODAL OVERLAY ────────────────────────────────────────── */
+.overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px; opacity: 0; pointer-events: none;
+  transition: opacity 0.25s;
+}
+.overlay.open { opacity: 1; pointer-events: all; }
+
+.modal {
+  background: var(--modal-bg); border: 1px solid var(--border-hi);
+  border-radius: 20px; width: 100%; max-width: 560px;
+  max-height: 90vh; overflow-y: auto;
+  transform: translateY(24px) scale(0.97);
+  transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  box-shadow: 0 40px 100px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
+}
+.overlay.open .modal { transform: translateY(0) scale(1); }
+
+.modal-header {
+  padding: 24px 24px 0;
+  display: flex; justify-content: space-between; align-items: flex-start;
+}
+.modal-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px; font-weight: 700; line-height: 1.2;
+}
+.modal-meta { font-size: 12px; color: var(--text2); margin-top: 3px; }
+.modal-close {
+  background: var(--border); border: none; cursor: pointer;
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; color: var(--text2); transition: all 0.15s;
+  flex-shrink: 0;
+}
+.modal-close:hover { background: var(--border-hi); color: var(--text); }
+
+.modal-body { padding: 20px 24px 28px; }
+
+/* ── AUDIO PLAYER ─────────────────────────────────────────── */
+.player-card {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 12px; padding: 18px; margin-bottom: 20px;
+}
+.player-label {
+  font-size: 10px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 1px; color: var(--text3); margin-bottom: 12px;
+}
+.player-controls {
+  display: flex; align-items: center; gap: 12px;
+}
+.play-btn {
+  width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
+  background: var(--accent); border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; color: var(--accent-text); transition: all 0.15s;
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+.play-btn:hover { transform: scale(1.08); box-shadow: 0 0 30px var(--accent-glow); }
+.play-btn:active { transform: scale(0.95); }
+.play-btn.playing { animation: play-pulse 1.5s ease-in-out infinite; }
+@keyframes play-pulse {
+  0%,100% { box-shadow: 0 0 20px var(--accent-glow); }
+  50%      { box-shadow: 0 0 40px rgba(184,240,74,0.4); }
+}
+
+.player-info { flex: 1; min-width: 0; }
+.player-filename {
+  font-size: 12px; font-weight: 600; color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  margin-bottom: 6px;
+}
+.player-progress {
+  position: relative; height: 4px; background: var(--border);
+  border-radius: 2px; cursor: pointer;
+}
+.player-progress-fill {
+  height: 100%; background: var(--accent); border-radius: 2px;
+  transition: width 0.1s; pointer-events: none;
+}
+.player-time {
+  display: flex; justify-content: space-between;
+  font-size: 11px; color: var(--text3); margin-top: 5px;
+  font-variant-numeric: tabular-nums;
+}
+.dl-btn {
+  background: none; border: 1px solid var(--border);
+  color: var(--text2); font-family: 'Outfit', sans-serif;
+  font-size: 12px; font-weight: 500; padding: 6px 12px;
+  border-radius: 8px; cursor: pointer; transition: all 0.15s;
+  display: flex; align-items: center; gap: 6px; white-space: nowrap;
+}
+.dl-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+
+/* ── REVIEW FORM ──────────────────────────────────────────── */
+.section-label {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1px; color: var(--text3); margin-bottom: 10px;
+}
+
+.star-rating {
+  display: flex; gap: 6px; margin-bottom: 20px;
+}
+.star-btn {
+  background: none; border: none; cursor: pointer;
+  font-size: 26px; color: var(--text3); transition: all 0.15s;
+  line-height: 1;
+}
+.star-btn:hover, .star-btn.active { color: var(--accent); transform: scale(1.2); }
+.star-btn.active { text-shadow: 0 0 12px var(--accent-glow); }
+
+.status-chooser {
+  display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap;
+}
+.status-choice {
+  padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border);
+  background: none; color: var(--text2); font-family: 'Outfit', sans-serif;
+  font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.18s;
+}
+.status-choice:hover { border-color: var(--border-hi); color: var(--text); }
+.status-choice.finalist.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+.status-choice.approved.active { background: rgba(52,211,153,0.12); border-color: #34d399; color: #34d399; }
+.status-choice.rejected.active { background: rgba(248,113,113,0.1); border-color: #f87171; color: #f87171; }
+
+.feedback-textarea {
+  width: 100%; background: var(--bg3); border: 1px solid var(--border);
+  color: var(--text); font-family: 'Outfit', sans-serif; font-size: 13px;
+  padding: 12px 14px; border-radius: 10px; resize: vertical;
+  min-height: 90px; outline: none; transition: border-color 0.2s;
+  margin-bottom: 16px;
+}
+.feedback-textarea:focus { border-color: var(--accent); }
+.feedback-textarea::placeholder { color: var(--text3); }
+
+.reviewer-input {
+  width: 100%; background: var(--bg3); border: 1px solid var(--border);
+  color: var(--text); font-family: 'Outfit', sans-serif; font-size: 13px;
+  padding: 10px 14px; border-radius: 10px; outline: none;
+  transition: border-color 0.2s; margin-bottom: 20px;
+}
+.reviewer-input:focus { border-color: var(--accent); }
+.reviewer-input::placeholder { color: var(--text3); }
+
+.submit-btn {
+  width: 100%; background: var(--accent); border: none; cursor: pointer;
+  font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 700;
+  color: var(--accent-text); padding: 13px; border-radius: 10px;
+  transition: all 0.2s; letter-spacing: 0.3px;
+}
+.submit-btn:hover { background: var(--accent-dim); transform: translateY(-1px); box-shadow: 0 8px 24px var(--accent-glow); }
+.submit-btn:active { transform: translateY(0); }
+.submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+.success-msg {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--accent-soft); border: 1px solid var(--accent);
+  border-radius: 10px; padding: 12px 16px;
+  font-size: 13px; font-weight: 600; color: var(--accent);
+  margin-bottom: 16px;
+}
+
+/* ── ADMIN PANEL ──────────────────────────────────────────── */
+.admin-panel {
+  position: fixed; bottom: 24px; right: 24px; z-index: 300;
+  background: var(--modal-bg); border: 1px solid var(--border-hi);
+  border-radius: var(--radius); padding: 20px; width: 380px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  display: none;
+}
+.admin-panel.open { display: block; }
+.admin-title {
+  font-size: 12px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1px; color: var(--accent); margin-bottom: 14px;
+}
+.admin-field { margin-bottom: 12px; }
+.admin-label { font-size: 11px; color: var(--text2); margin-bottom: 5px; }
+.admin-input {
+  width: 100%; background: var(--bg3); border: 1px solid var(--border);
+  color: var(--text); font-family: 'Outfit', sans-serif; font-size: 12px;
+  padding: 8px 10px; border-radius: 8px; outline: none;
+}
+.admin-input:focus { border-color: var(--accent); }
+.admin-row { display: flex; gap: 8px; margin-top: 4px; }
+.admin-btn {
+  flex: 1; background: var(--accent); border: none; cursor: pointer;
+  font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 700;
+  color: var(--accent-text); padding: 8px; border-radius: 8px; transition: all 0.15s;
+}
+.admin-btn:hover { background: var(--accent-dim); }
+.admin-btn.secondary {
+  background: var(--border); color: var(--text2);
+}
+.admin-btn.secondary:hover { background: var(--border-hi); color: var(--text); }
+
+/* ── ROLE STEP ────────────────────────────────────────────── */
+.role-step-header {
+  display: flex; gap: 14px; align-items: center;
+  background: var(--accent-soft); border: 1px solid var(--accent-glow);
+  border-radius: 12px; padding: 14px 16px; margin-bottom: 24px;
+}
+.role-step-check {
+  width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+  background: var(--accent); color: var(--accent-text);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 700;
+}
+.role-pick-btn {
+  display: flex; align-items: center; gap: 14px;
+  background: var(--card-bg); border: 1px solid var(--border);
+  border-radius: 12px; padding: 14px 16px; cursor: pointer;
+  text-align: left; width: 100%; transition: all 0.18s;
+  font-family: 'Outfit', sans-serif; color: var(--text);
+}
+.role-pick-btn:hover { border-color: var(--border-hi); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
+.role-pick-btn.selected-licensed  { border-color: var(--accent); background: var(--accent-soft); }
+.role-pick-btn.selected-supporting{ border-color: var(--pink);   background: var(--pink-soft); }
+.role-pick-icon {
+  width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+}
+
+/* ── ROLE STEP (continued) ───────────────────────────────── */
+.loading-screen {
+  position: fixed; inset: 0; z-index: 500;
+  background: var(--bg);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 20px; transition: opacity 0.4s;
+}
+.loading-screen.hidden { opacity: 0; pointer-events: none; }
+.loading-logo {
+  font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700;
+  color: var(--text); display: flex; align-items: center; gap: 10px;
+}
+  width: 200px; height: 2px; background: var(--border); border-radius: 1px; overflow: hidden;
+}
+.loading-bar {
+  height: 100%; width: 0; background: var(--accent); border-radius: 1px;
+  animation: load-bar 1.8s ease-out forwards;
+}
+@keyframes load-bar { 0%{width:0} 60%{width:80%} 100%{width:100%} }
+.loading-text { font-size: 12px; color: var(--text3); font-weight: 300; }
+
+/* ── DASHBOARD TAB ────────────────────────────────────────── */
+.progress-section {
+  background: var(--card-bg); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 24px; margin-bottom: 20px;
+}
+.progress-title {
+  font-family: 'Playfair Display', serif; font-size: 16px;
+  margin-bottom: 18px; color: var(--text);
+}
+.progress-row { margin-bottom: 14px; }
+.progress-row-top {
+  display: flex; justify-content: space-between; margin-bottom: 5px;
+  font-size: 13px;
+}
+.progress-row-top span:first-child { font-weight: 500; }
+.progress-row-top span:last-child { color: var(--text2); font-size: 12px; }
+.progress-track {
+  height: 6px; background: var(--border); border-radius: 3px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; border-radius: 3px; transition: width 1s ease-out;
+}
+
+.lang-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px;
+  margin-top: 12px;
+}
+.lang-card {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px 14px;
+  transition: border-color 0.2s; cursor: pointer;
+}
+.lang-card:hover { border-color: var(--border-hi); }
+.lang-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.lang-count { font-size: 11px; color: var(--text2); }
+
+/* ── RESPONSIVE ───────────────────────────────────────────── */
+@media (max-width: 768px) {
+  main { padding: 20px 16px; }
+  header { padding: 0 16px; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .hero { flex-direction: column; align-items: flex-start; }
+  table { display: none; }
+  .mobile-cards { display: flex; flex-direction: column; gap: 12px; }
+  .mobile-card {
+    background: var(--card-bg); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px; cursor: pointer;
+    transition: border-color 0.15s;
+  }
+  .mobile-card:hover { border-color: var(--border-hi); }
+}
+@media (min-width: 769px) { .mobile-cards { display: none; } }
+
+/* ── TOAST ────────────────────────────────────────────────── */
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(60px);
+  background: var(--card-bg); border: 1px solid var(--accent);
+  border-radius: 10px; padding: 12px 20px;
+  font-size: 13px; font-weight: 600; color: var(--accent);
+  z-index: 999; transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  pointer-events: none; white-space: nowrap;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+/* ── FADE IN ROWS ─────────────────────────────────────────── */
+tbody tr { animation: row-in 0.3s ease both; }
+@keyframes row-in { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:none; } }
+</style>
+</head>
+<body>
+
+<!-- Loading screen -->
+<div class="loading-screen" id="loadingScreen">
+  <div class="loading-logo">
+    <div class="logo-dot"></div>
+    Foreground Recordings
+  </div>
+  <div class="loading-bar-wrap"><div class="loading-bar"></div></div>
+  <div class="loading-text">Loading talent roster…</div>
+</div>
+
+<!-- Header -->
+<header>
+  <div class="logo">
+    <div class="logo-dot"></div>
+    <span style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;letter-spacing:-0.3px">Foreground Recordings</span>
+  </div>
+  <nav class="header-nav">
+    <button class="nav-btn active" id="navDashboard" onclick="switchTab('dashboard')">Dashboard</button>
+    <button class="nav-btn"        id="navRoster"    onclick="switchTab('roster')">Roster</button>
+  </nav>
+  <div class="header-right">
+    <div id="authIndicator" style="display:none;align-items:center;gap:8px;font-size:12px;color:var(--text2)">
+      <span id="authEmail2" style="font-family:monospace"></span>
+      <button onclick="signOut()" style="background:none;border:1px solid var(--border);color:var(--text3);border-radius:6px;padding:3px 9px;font-size:11px;cursor:pointer;font-family:'Outfit',sans-serif">Sign out</button>
+    </div>
+    <button onclick="openAuthModal()" id="signInBtn" style="background:var(--accent-soft);border:1px solid var(--accent-glow);color:var(--accent);font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;padding:5px 14px;border-radius:8px;cursor:pointer">Sign in</button>
+    <button class="mode-btn" id="modeBtn" onclick="toggleMode()" title="Toggle light/dark mode">
+      <span id="modeIcon">☀</span><span id="modeLabel">Light mode</span>
+    </button>
+  </div>
+</header>
+
+<!-- Main -->
+<main>
+
+  <!-- DASHBOARD TAB -->
+  <div id="tabDashboard">
+    <div class="hero">
+      <div class="hero-text">
+        <h1>Voice Talent<br/><em>Review Panel</em></h1>
+        <p id="dashSubtitle">Loading talent roster…</p>
+      </div>
+    </div>
+
+    <div class="stats-grid" id="statsGrid">
+      <div class="stat-card" >
+        <div class="stat-num" id="statTotal">—</div>
+        <div class="stat-label">Total Candidates</div>
+      </div>
+      <div class="stat-card" style="--accent:#f59e0b">
+        <div class="stat-num" id="statPending">—</div>
+        <div class="stat-label">Pending Review</div>
+      </div>
+      <div class="stat-card" style="--accent:#34d399">
+        <div class="stat-num" id="statFinalist">—</div>
+        <div class="stat-label">Finalists</div>
+      </div>
+      <div class="stat-card" style="--accent:#E8407A">
+        <div class="stat-num" id="statRated">—</div>
+        <div class="stat-label">Rated</div>
+      </div>
+    </div>
+
+    <div class="progress-section" id="progressSection">
+      <div class="progress-title">Review Progress by Language</div>
+      <div id="progressBars"></div>
+    </div>
+
+    <div class="progress-section">
+      <div class="progress-title">Languages in this Cohort</div>
+      <div class="lang-grid" id="langGrid"></div>
+    </div>
+  </div>
+
+  <!-- ROSTER TAB -->
+  <div id="tabRoster" style="display:none">
+    <div class="filter-bar" id="filterBar">
+      <button class="filter-pill active" onclick="filterLang('all', this)">All</button>
+      <!-- language pills injected here -->
+      <div class="search-wrap">
+        <span class="search-icon">⌕</span>
+        <input type="text" id="searchInput" placeholder="Search name or ID…" oninput="applySearch()"/>
+      </div>
+    </div>
+
+    <!-- Desktop table -->
+    <div class="table-wrap">
+      <table id="rosterTable">
+        <thead>
+          <tr>
+            <th>UUID · VT ID</th>
+            <th>Language</th>
+            <th>Role</th>
+            <th>Recording</th>
+            <th>Rating</th>
+            <th>Review Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="rosterBody"></tbody>
+      </table>
+      <div id="emptyState" class="empty-state" style="display:none">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <h3>No results found</h3>
+        <p>Try a different filter or search term.</p>
+      </div>
+    </div>
+
+    <!-- Mobile cards -->
+    <div class="mobile-cards" id="mobileCards"></div>
+  </div>
+</main>
+
+<!-- Review Modal -->
+<div class="overlay" id="modalOverlay" onclick="closeModalOnOverlay(event)">
+  <div class="modal" id="reviewModal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-name" id="modalName">—</div>
+        <div class="modal-meta" id="modalMeta">—</div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- Recording player -->
+      <div class="player-card" id="playerCard">
+        <div class="player-label">Recording Sample</div>
+        <div class="player-controls">
+          <button class="play-btn" id="playBtn" onclick="togglePlay()">▶</button>
+          <div class="player-info">
+            <div class="player-filename" id="playerFilename">—</div>
+            <div class="player-progress" id="playerProgress" onclick="scrub(event)">
+              <div class="player-progress-fill" id="progressFill" style="width:0%"></div>
+            </div>
+            <div class="player-time">
+              <span id="timeElapsed">0:00</span>
+              <span id="timeDuration">—</span>
+            </div>
+          </div>
+          <a id="dlBtn" class="dl-btn" href="#" download target="_blank">
+            ↓ Download
+          </a>
+        </div>
+      </div>
+      <audio id="audioEl" preload="none"></audio>
+
+      <!-- Success message -->
+      <div class="success-msg" id="successMsg" style="display:none">
+        ✓ Feedback saved — thank you!
+      </div>
+
+      <!-- Rating -->
+      <div class="section-label">Your Rating</div>
+      <div class="star-rating" id="starRating">
+        <button class="star-btn" onclick="setRating(1)" data-val="1">★</button>
+        <button class="star-btn" onclick="setRating(2)" data-val="2">★</button>
+        <button class="star-btn" onclick="setRating(3)" data-val="3">★</button>
+        <button class="star-btn" onclick="setRating(4)" data-val="4">★</button>
+        <button class="star-btn" onclick="setRating(5)" data-val="5">★</button>
+      </div>
+
+      <!-- Status -->
+      <div class="section-label">Mark as</div>
+      <div class="status-chooser">
+        <button class="status-choice finalist" onclick="setStatus('Finalist')">⭐ Finalist</button>
+        <button class="status-choice approved" onclick="setStatus('Approved')">✓ Approved</button>
+        <button class="status-choice rejected" onclick="setStatus('Rejected')">✕ Rejected</button>
+      </div>
+
+      <!-- Feedback text -->
+      <div class="section-label">Comments</div>
+      <textarea class="feedback-textarea" id="feedbackText" placeholder="Any notes on this voice talent — tone, pacing, fit for the project…"></textarea>
+
+      <!-- Reviewer name -->
+      <div class="section-label">Your Name</div>
+      <input type="text" class="reviewer-input" id="reviewerName" placeholder="e.g. Maria — Casting Lead"/>
+
+      <button class="submit-btn" id="submitBtn" onclick="submitReview()">Save Feedback</button>
+    </div>
+
+    <!-- Step 2: Role assignment (shown after Approved is saved) -->
+    <div class="modal-body" id="roleStep" style="display:none">
+      <div class="role-step-header">
+        <div class="role-step-check">✓</div>
+        <div>
+          <div style="font-size:15px;font-weight:700;color:var(--text)">Marked as Approved</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:2px">One more step — assign a role for this candidate</div>
+        </div>
+      </div>
+      <div class="section-label" style="margin-bottom:12px">Assign Role</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:24px">
+        <button class="role-pick-btn" id="rolePickLicensed" onclick="assignRole('Licensed')">
+          <div class="role-pick-icon" style="background:var(--accent-soft);color:var(--accent)">●</div>
+          <div>
+            <div style="font-weight:700;font-size:14px">Licensed</div>
+            <div style="font-size:12px;color:var(--text2);margin-top:1px">Primary voice — full licensing rights</div>
+          </div>
+        </button>
+        <button class="role-pick-btn" id="rolePickSupporting" onclick="assignRole('Supporting')">
+          <div class="role-pick-icon" style="background:var(--pink-soft);color:var(--pink)">●</div>
+          <div>
+            <div style="font-weight:700;font-size:14px">Supporting</div>
+            <div style="font-size:12px;color:var(--text2);margin-top:1px">Secondary voice — supporting role</div>
+          </div>
+        </button>
+      </div>
+      <button class="submit-btn" style="background:var(--border);color:var(--text2);margin-bottom:0" onclick="skipRole()">
+        Assign later
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Email Auth Modal -->
+<div class="overlay" id="authOverlay">
+  <div class="modal" id="authModal" style="max-width:420px">
+    <div class="modal-header" style="padding-bottom:0">
+      <div>
+        <div class="modal-name" style="font-size:18px">Sign in to review</div>
+        <div class="modal-meta" style="margin-top:4px">Enter your email to submit ratings and feedback</div>
+      </div>
+    </div>
+    <div class="modal-body" style="padding-top:18px">
+      <div class="section-label" style="margin-bottom:8px">Your email</div>
+      <input type="email" class="reviewer-input" id="authEmail" placeholder="you@example.com"
+        style="margin-bottom:6px" onkeydown="if(event.key==='Enter')submitAuth()"/>
+      <div id="authError" style="font-size:12px;color:#f87171;min-height:18px;margin-bottom:14px;display:none"></div>
+      <button class="submit-btn" id="authBtn" onclick="submitAuth()">Continue</button>
+      <button onclick="closeAuthModal()" style="width:100%;background:none;border:none;color:var(--text3);font-family:'Outfit',sans-serif;font-size:13px;margin-top:12px;cursor:pointer;padding:6px">
+        View only — browse without signing in
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- View-only banner (shown inside review modal for non-whitelisted users) -->
+<div id="viewOnlyBanner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:150;
+  background:var(--bg3);border-top:1px solid var(--border);
+  padding:10px 24px;display:none;align-items:center;gap:12px;justify-content:center">
+  <span style="font-size:13px;color:var(--text2)">👁 View only —</span>
+  <span style="font-size:13px;color:var(--text2)" id="viewOnlyMsg">sign in with an authorised email to leave feedback</span>
+  <button onclick="openAuthModal()" style="background:var(--accent);color:var(--accent-text);border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;font-family:'Outfit',sans-serif;cursor:pointer;flex-shrink:0">Sign in</button>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONFIG — hardcoded URLs ───────────────────────────────────────────────────
+// NOTE: This is soft auth suitable for an internal client tool.
+// The script URL is visible in source — this prevents accidental edits,
+// not a determined bad actor. Keep the sheet itself access-controlled in Drive.
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyFdGIbkYz1AqVDmIp5F6vo4lXGcXkIw2PbTDNePDvbr9_YCI4bAk2RiLcYO43p7bNKeA/exec"; // ← paste your GAS web app URL
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let talents       = [];
+let feedback      = {};   // { talent_id: { rating, status, role, comment, reviewer } }
+let currentTalent = null;
+let currentRating = 0;
+let currentStatus = '';
+let activeLang    = 'all';
+let activeSearch  = '';
+let activeRow     = null;
+
+// Auth state — session only (cleared on tab close)
+let sessionEmail    = sessionStorage.getItem('vth_email')   || '';
+let sessionAllowed  = sessionStorage.getItem('vth_allowed') === 'true';
+let authChecked     = !!sessionEmail; // already validated this session
+
+// ── BOOT ──────────────────────────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  try { feedback = JSON.parse(localStorage.getItem('vth_feedback') || '{}'); } catch(e) {}
+  loadFromGAS();
+});
+
+// ── GAS LOADER — fetches talents via script doGet?action=init ─────────────────
+function loadFromGAS() {
+  fetch(`${SCRIPT_URL}?action=init`)
+    .then(r => { if (!r.ok) throw new Error('Fetch failed'); return r.json(); })
+    .then(data => {
+      if (data.ok && data.talents && data.talents.length) {
+        talents = data.talents.map(t => {
+          const vtId = t.vt_id || t.talent_id || t.id || '';
+          const uuid = t.uuid  || t.vt_uuid   || '';
+          const key  = vtId || uuid;
+          return { ...t, talent_id: key, vt_id: vtId, uuid };
+        });
+      } else {
+        talents = DEMO_TALENTS;
+      }
+      hideLanding();
+      render();
+      updateAuthUI();
+    })
+    .catch(() => {
+      talents = DEMO_TALENTS;
+      hideLanding();
+      render();
+      updateAuthUI();
+    });
+}
+
+// ── DEMO DATA (used when SCRIPT_URL not yet configured) ───────────────────────
+const DEMO_TALENTS = [
+  { talent_id:'366',  vt_id:'366',  uuid:'VT-366',  language:'Afrikaans', recording:'', bio:'Warm, authoritative narration with natural South African tone.' },
+  { talent_id:'VT-272',vt_id:'',   uuid:'VT-272',  language:'Basque',    recording:'', bio:'Distinctive Basque cadence, versatile across commercial and documentary styles.' },
+  { talent_id:'VT-082',vt_id:'',   uuid:'VT-082',  language:'Greek',     recording:'', bio:'Expressive, emotive delivery with modern Greek sensibility.' },
+  { talent_id:'VT-918',vt_id:'',   uuid:'VT-918',  language:'Greek',     recording:'', bio:'Gentle and approachable — excellent for e-learning and guides.' },
+  { talent_id:'1106', vt_id:'1106',uuid:'VT-1106', language:'Greek',     recording:'', bio:'Deep resonant voice, well-suited for brand storytelling.' },
+  { talent_id:'1107', vt_id:'1107',uuid:'VT-1107', language:'Hebrew',    recording:'', bio:'Crisp, professional delivery with a contemporary accent.' },
+  { talent_id:'1108', vt_id:'1108',uuid:'VT-1108', language:'Hebrew',    recording:'', bio:'Energetic and dynamic — natural fit for marketing content.' },
+  { talent_id:'1110', vt_id:'1110',uuid:'VT-1110', language:'Persian',   recording:'', bio:'Measured, thoughtful pacing — excellent clarity throughout.' },
+  { talent_id:'242',  vt_id:'242', uuid:'VT-242',  language:'Tamil',     recording:'', bio:'Clear articulation with warm undertones, excellent for explainers.' },
+  { talent_id:'VT-137',vt_id:'',  uuid:'VT-137',  language:'Ukrainian', recording:'', bio:'Bright, engaging presence with strong professional background.' },
+];
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function hideLanding() {
+  const ls = document.getElementById('loadingScreen');
+  ls.classList.add('hidden');
+  setTimeout(() => ls.style.display = 'none', 500);
+}
+
+function render() {
+  renderStats();
+  renderProgress();
+  renderLangGrid();
+  renderLangPills();
+  renderRoster();
+}
+
+function renderStats() {
+  const total    = talents.length;
+  const rated    = talents.filter(t => feedback[t.talent_id]?.rating).length;
+  const finalist = talents.filter(t => feedback[t.talent_id]?.status === 'Finalist').length;
+  const pending  = total - rated;
+  document.getElementById('statTotal').textContent    = total;
+  document.getElementById('statPending').textContent  = pending;
+  document.getElementById('statFinalist').textContent = finalist;
+  document.getElementById('statRated').textContent    = rated;
+  document.getElementById('dashSubtitle').textContent =
+    `${total} candidates · ${rated} reviewed · ${finalist} finalists selected`;
+}
+
+function renderProgress() {
+  const langs = [...new Set(talents.map(t => t.language))].filter(Boolean).sort();
+  const html  = langs.map(lang => {
+    const group   = talents.filter(t => t.language === lang);
+    const done    = group.filter(t => feedback[t.talent_id]?.rating).length;
+    const pct     = group.length ? Math.round(done / group.length * 100) : 0;
+    const color   = pct === 100 ? 'var(--accent)' : pct > 50 ? '#34d399' : '#f59e0b';
+    return `
+      <div class="progress-row">
+        <div class="progress-row-top">
+          <span>${lang}</span>
+          <span>${done} / ${group.length}</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" style="width:${pct}%;background:${color}"></div>
+        </div>
+      </div>`;
+  }).join('');
+  document.getElementById('progressBars').innerHTML = html || '<p style="color:var(--text3);font-size:13px">No candidates loaded.</p>';
+}
+
+function renderLangGrid() {
+  const langs = [...new Set(talents.map(t => t.language))].filter(Boolean).sort();
+  document.getElementById('langGrid').innerHTML = langs.map(lang => {
+    const group    = talents.filter(t => t.language === lang);
+    const licensed  = group.filter(t => {
+      const r = (feedback[t.talent_id]?.role || t.role || '').toLowerCase();
+      return feedback[t.talent_id]?.status === 'Approved' && r.includes('licens');
+    }).length;
+    const support   = group.filter(t => {
+      const r = (feedback[t.talent_id]?.role || t.role || '').toLowerCase();
+      return feedback[t.talent_id]?.status === 'Approved' && r.includes('support');
+    }).length;
+    const rejected  = group.filter(t => feedback[t.talent_id]?.status === 'Rejected').length;
+    const done     = group.filter(t => feedback[t.talent_id]?.rating).length;
+    const rolesStr = [
+      licensed ? `<span class="role-status licensed">● ${licensed} Licensed</span>` : '',
+      support  ? `<span class="role-status supporting">● ${support} Supporting</span>` : '',
+      rejected ? `<span class="role-status rejected">✕ ${rejected} Rejected</span>` : '',
+    ].filter(Boolean).join(' ');
+    return `<div class="lang-card" onclick="switchTab('roster');filterLang('${lang}',null)">
+      <div class="lang-name">${lang}</div>
+      <div class="lang-count">${group.length} candidate${group.length!==1?'s':''} · ${done} reviewed</div>
+      ${rolesStr ? `<div style="margin-top:4px">${rolesStr}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function renderLangPills() {
+  const langs = [...new Set(talents.map(t => t.language))].filter(Boolean).sort();
+  const bar   = document.getElementById('filterBar');
+  // Remove old lang pills (not the first All pill, not the search wrap)
+  bar.querySelectorAll('.lang-pill').forEach(el => el.remove());
+  const searchWrap = bar.querySelector('.search-wrap');
+  langs.forEach(lang => {
+    const btn = document.createElement('button');
+    btn.className  = 'filter-pill lang-pill';
+    btn.textContent = lang;
+    btn.onclick    = () => filterLang(lang, btn);
+    bar.insertBefore(btn, searchWrap);
+  });
+}
+
+function filtered() {
+  return talents.filter(t => {
+    if (activeLang !== 'all' && t.language !== activeLang) return false;
+    if (activeSearch) {
+      const q = activeSearch.toLowerCase();
+      return (t.uuid||'').toLowerCase().includes(q) ||
+             (t.vt_id||'').toLowerCase().includes(q) ||
+             (t.talent_id||'').toLowerCase().includes(q) ||
+             (t.language||'').toLowerCase().includes(q) ||
+             (t.role||'').toLowerCase().includes(q);
+    }
+    return true;
+  });
+}
+
+function renderRoster() {
+  const list = filtered();
+  const tbody = document.getElementById('rosterBody');
+  const empty = document.getElementById('emptyState');
+  const mobile = document.getElementById('mobileCards');
+
+  if (list.length === 0) {
+    tbody.innerHTML = '';
+    mobile.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  const mkRoleStatus = (t) => {
+    const fb   = feedback[t.talent_id] || {};
+    const reviewStatus = fb.status || '';
+    // Role only meaningful if Approved
+    if (reviewStatus !== 'Approved') return '<span style="color:var(--text3);font-size:11px">—</span>';
+    const role = (fb.role || t.role || '').toLowerCase().trim();
+    if (role.includes('licens'))  return `<span class="role-status licensed">● Licensed</span>`;
+    if (role.includes('support')) return `<span class="role-status supporting">● Supporting</span>`;
+    // Approved but role not yet assigned
+    return `<span class="role-status pending" style="font-style:italic">Pending role</span>`;
+  };
+  const mkStars = (r) => r ? [1,2,3,4,5].map(i => `<span class="star-icon${i<=r?' filled':''}">★</span>`).join('') : '<span style="color:var(--text3);font-size:11px">—</span>';
+  const mkStatus = (s) => {
+    if (!s) return '<span class="status-pill pending">Pending</span>';
+    const cls = s.toLowerCase();
+    const icon = s==='Finalist'?'⭐':s==='Approved'?'✓':'✕';
+    return `<span class="status-pill ${cls}">${icon} ${s}</span>`;
+  };
+  const hasAudio = (t) => t.recording || t.drive_file_id;
+
+  // Show UUID always; show VT ID alongside if it exists and differs
+  const mkIds = (t) => {
+    const uuid = t.uuid || '';
+    const vtid = t.vt_id || '';
+    if (vtid && uuid && vtid !== uuid) {
+      return `${uuid} <span style="color:var(--text3)">·</span> <span style="color:var(--accent);font-weight:700">${vtid}</span>`;
+    }
+    return vtid || uuid || '—';
+  };
+
+  tbody.innerHTML = list.map((t,i) => {
+    const fb = feedback[t.talent_id] || {};
+    const audioUrl = getAudioUrl(t);
+    return `<tr onclick="openModal('${t.talent_id}')" style="animation-delay:${i*30}ms">
+      <td class="td-id" style="font-size:11px;line-height:1.5">${mkIds(t)}</td>
+      <td class="td-lang"><span class="lang-tag">${t.language||'—'}</span></td>
+      <td>${mkRoleStatus(t)}</td>
+      <td>
+        ${audioUrl
+          ? `<button class="mini-play" id="miniPlay-${t.talent_id}" onclick="event.stopPropagation();miniPlay('${t.talent_id}','${audioUrl}')" title="Play">▶</button>`
+          : `<span style="color:var(--text3);font-size:11px">—</span>`
+        }
+      </td>
+      <td><div class="stars-display">${mkStars(fb.rating)}</div></td>
+      <td>${mkStatus(fb.status)}</td>
+      <td><button class="review-btn${fb.rating?' done':''}" onclick="event.stopPropagation();openModal('${t.talent_id}')">${fb.rating?'Edit':'Review'}</button></td>
+    </tr>`;
+  }).join('');
+
+  // Mobile cards
+  mobile.innerHTML = list.map(t => {
+    const fb = feedback[t.talent_id] || {};
+    return `<div class="mobile-card" onclick="openModal('${t.talent_id}')">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+        <div>
+          <div style="font-size:12px;font-family:monospace;font-weight:600;color:var(--text)">${mkIds(t)}</div>
+          <div style="font-size:11px;color:var(--text2);margin-top:4px;display:flex;gap:6px;align-items:center">${t.language||'—'} · ${mkRoleStatus(t)}</div>
+        </div>
+        ${mkStatus(fb.status)}
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="stars-display">${mkStars(fb.rating)}</div>
+        <button class="review-btn${fb.rating?' done':''}" style="font-size:11px">Review →</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── AUDIO ─────────────────────────────────────────────────────────────────────
+function getAudioUrl(t) {
+  if (t.recording && t.recording.startsWith('http')) return t.recording;
+  if (t.drive_file_id) return `https://drive.google.com/uc?export=open&id=${t.drive_file_id}`;
+  if (t.recording) return `https://drive.google.com/uc?export=open&id=${t.recording}`;
+  return '';
+}
+function getDownloadUrl(t) {
+  if (t.drive_file_id) return `https://drive.google.com/uc?export=download&id=${t.drive_file_id}`;
+  if (t.recording && !t.recording.startsWith('http')) return `https://drive.google.com/uc?export=download&id=${t.recording}`;
+  return t.recording || '';
+}
+
+function fmtTime(sec) {
+  if (isNaN(sec)) return '0:00';
+  const m = Math.floor(sec / 60), s = Math.floor(sec % 60);
+  return `${m}:${s.toString().padStart(2,'0')}`;
+}
+
+function miniPlay(id, url) {
+  const audio = document.getElementById('audioEl');
+  const btn   = document.getElementById(`miniPlay-${id}`);
+
+  // If same track — toggle
+  if (activeRow === id) {
+    if (audio.paused) { audio.play(); btn.classList.add('playing'); btn.innerHTML = '⏸'; }
+    else              { audio.pause(); btn.classList.remove('playing'); btn.innerHTML = '▶'; }
+    return;
+  }
+  // Stop previous
+  if (activeRow) {
+    const prev = document.getElementById(`miniPlay-${activeRow}`);
+    if (prev) { prev.classList.remove('playing'); prev.innerHTML = '▶'; }
+    audio.pause();
+  }
+  activeRow = id;
+  audio.src = url;
+  audio.play().then(() => {
+    btn.classList.add('playing'); btn.innerHTML = '⏸';
+  }).catch(() => showToast('Audio unavailable — check Drive sharing settings'));
+  audio.onended = () => { btn.classList.remove('playing'); btn.innerHTML = '▶'; activeRow = null; };
+}
+
+// ── MODAL ─────────────────────────────────────────────────────────────────────
+function openModal(id) {
+  currentTalent = talents.find(t => t.talent_id === id);
+  if (!currentTalent) return;
+
+  const fb = feedback[id] || {};
+  currentRating = fb.rating || 0;
+  currentStatus = fb.status || '';
+
+  const roleLabel = (() => {
+    const r = (currentTalent.role||'').toLowerCase();
+    if (r.includes('licens'))  return 'Licensed';
+    if (r.includes('support')) return 'Supporting';
+    if (r.includes('reject'))  return 'Rejected';
+    return 'Pending';
+  })();
+
+  const uuid = currentTalent.uuid || '';
+  const vtid = currentTalent.vt_id || '';
+  const modalTitle = (uuid && vtid && uuid !== vtid)
+    ? `${uuid}  ·  ${vtid}`
+    : (vtid || uuid || '—');
+
+  document.getElementById('modalName').textContent = modalTitle;
+  document.getElementById('modalMeta').textContent =
+    `${currentTalent.language}  ·  ${roleLabel}${currentTalent.bio ? '  —  ' + currentTalent.bio : ''}`;
+
+  // Player
+  const audioUrl = getAudioUrl(currentTalent);
+  const audio    = document.getElementById('audioEl');
+  audio.src = audioUrl || '';
+  document.getElementById('playerFilename').textContent =
+    audioUrl ? `${modalTitle} — Recording Sample` : 'No audio file linked';
+  document.getElementById('progressFill').style.width = '0%';
+  document.getElementById('timeElapsed').textContent   = '0:00';
+  document.getElementById('timeDuration').textContent  = '—';
+  document.getElementById('playBtn').innerHTML         = '▶';
+  document.getElementById('playBtn').classList.remove('playing');
+  document.getElementById('playerCard').style.opacity = audioUrl ? '1' : '0.4';
+
+  // Download — only for whitelisted users
+  const dl    = document.getElementById('dlBtn');
+  const dlUrl = getDownloadUrl(currentTalent);
+  dl.href     = dlUrl || '#';
+  dl.style.display = (dlUrl && sessionAllowed) ? 'flex' : 'none';
+
+  // Restore feedback
+  renderStars(currentRating);
+  renderStatusBtns(currentStatus);
+  document.getElementById('feedbackText').value = fb.comment || '';
+  document.getElementById('reviewerName').value = fb.reviewer || sessionEmail || '';
+  document.getElementById('successMsg').style.display = 'none';
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('submitBtn').textContent = 'Save Feedback';
+
+  // View-only mode — hide all interactive review elements for non-allowed users
+  const isEditor = sessionAllowed;
+  const reviewControls = ['starRating','status-chooser-wrap','feedbackSection','reviewerSection','submitBtn'];
+  document.querySelectorAll('.star-rating, .status-chooser, .feedback-textarea, .reviewer-input, #submitBtn, .section-label:not(#playerLabel)').forEach(el => {
+    el.style.display = isEditor ? '' : 'none';
+  });
+
+  // View-only notice inside modal
+  let voNotice = document.getElementById('modalViewOnly');
+  if (!voNotice) {
+    voNotice = document.createElement('div');
+    voNotice.id = 'modalViewOnly';
+    voNotice.style.cssText = 'background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 16px;font-size:13px;color:var(--text2);display:flex;align-items:center;gap:10px;margin-bottom:4px';
+    voNotice.innerHTML = '<span style="font-size:16px">👁</span><span>You\'re in view-only mode. <button onclick="openAuthModal()" style="background:none;border:none;color:var(--accent);cursor:pointer;font-family:\'Outfit\',sans-serif;font-size:13px;font-weight:600;padding:0;text-decoration:underline">Sign in</button> with an authorised email to leave feedback.</span>';
+    document.getElementById('submitBtn').parentNode.insertBefore(voNotice, document.getElementById('submitBtn'));
+  }
+  voNotice.style.display = isEditor ? 'none' : 'flex';
+
+  // Ensure step 1 visible, step 2 hidden on open
+  document.getElementById('reviewModal').querySelector('.modal-body:not(#roleStep)').style.display = '';
+  document.getElementById('roleStep').style.display = 'none';
+
+  document.getElementById('modalOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+  const audio = document.getElementById('audioEl');
+  audio.pause(); audio.src = '';
+  document.getElementById('playBtn').innerHTML = '▶';
+  document.getElementById('playBtn').classList.remove('playing');
+  // Reset step 2 back to hidden, step 1 back to visible
+  const step1 = document.getElementById('reviewModal').querySelector('.modal-body:not(#roleStep)');
+  const step2 = document.getElementById('roleStep');
+  step1.style.display = '';
+  step2.style.display = 'none';
+}
+
+function closeModalOnOverlay(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeModal();
+}
+
+function togglePlay() {
+  const audio  = document.getElementById('audioEl');
+  const btn    = document.getElementById('playBtn');
+  if (!audio.src || audio.src === window.location.href) {
+    showToast('No audio file linked for this candidate'); return;
+  }
+  if (audio.paused) {
+    audio.play().then(()=>{btn.innerHTML='⏸';btn.classList.add('playing');})
+      .catch(()=>showToast('Could not play — check Drive sharing settings'));
+  } else {
+    audio.pause(); btn.innerHTML='▶'; btn.classList.remove('playing');
+  }
+}
+
+// Audio time updates
+const audioEl = document.getElementById('audioEl');
+audioEl.addEventListener('timeupdate', () => {
+  if (!audioEl.duration) return;
+  const pct = audioEl.currentTime / audioEl.duration * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('timeElapsed').textContent = fmtTime(audioEl.currentTime);
+  document.getElementById('timeDuration').textContent = fmtTime(audioEl.duration);
+});
+audioEl.addEventListener('ended', () => {
+  document.getElementById('playBtn').innerHTML = '▶';
+  document.getElementById('playBtn').classList.remove('playing');
+});
+audioEl.addEventListener('loadedmetadata', () => {
+  document.getElementById('timeDuration').textContent = fmtTime(audioEl.duration);
+});
+
+function scrub(e) {
+  const audio = document.getElementById('audioEl');
+  if (!audio.duration) return;
+  const rect = document.getElementById('playerProgress').getBoundingClientRect();
+  audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
+}
+
+// ── AUTH ──────────────────────────────────────────────────────────────────────
+function openAuthModal(afterAuth) {
+  document._authCallback = afterAuth || null;
+  document.getElementById('authOverlay').classList.add('open');
+  document.getElementById('authError').style.display = 'none';
+  document.getElementById('authEmail').value = sessionEmail || '';
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => document.getElementById('authEmail').focus(), 300);
+}
+
+function closeAuthModal() {
+  document.getElementById('authOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+  document._authCallback = null;
+}
+
+async function submitAuth() {
+  const email = document.getElementById('authEmail').value.trim().toLowerCase();
+  const errEl = document.getElementById('authError');
+  const btn   = document.getElementById('authBtn');
+
+  if (!email || !email.includes('@')) {
+    errEl.textContent = 'Please enter a valid email address.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true; btn.textContent = 'Checking…';
+  errEl.style.display = 'none';
+
+  try {
+    const res  = await fetch(`${SCRIPT_URL}?action=auth&email=${encodeURIComponent(email)}`);
+    const data = await res.json();
+
+    sessionEmail   = email;
+    sessionAllowed = !!(data.ok && data.allowed);
+    sessionStorage.setItem('vth_email',   sessionEmail);
+    sessionStorage.setItem('vth_allowed', sessionAllowed);
+    authChecked = true;
+
+    closeAuthModal();
+    updateAuthUI();
+    renderRoster(); // refresh role/download visibility
+
+    if (sessionAllowed) {
+      showToast('Signed in — you can now submit feedback');
+      if (document._authCallback) document._authCallback();
+    } else {
+      showToast('View only — your email is not on the reviewer list');
+    }
+
+  } catch (err) {
+    // If GAS unreachable (e.g. demo mode), allow locally with view-only
+    sessionEmail   = email;
+    sessionAllowed = false;
+    authChecked    = true;
+    sessionStorage.setItem('vth_email', sessionEmail);
+    closeAuthModal();
+    updateAuthUI();
+    showToast('Could not verify email — view only mode');
+  }
+
+  btn.disabled = false; btn.textContent = 'Continue';
+}
+
+function signOut() {
+  sessionEmail   = '';
+  sessionAllowed = false;
+  authChecked    = false;
+  sessionStorage.removeItem('vth_email');
+  sessionStorage.removeItem('vth_allowed');
+  updateAuthUI();
+  renderRoster();
+  showToast('Signed out');
+}
+
+function updateAuthUI() {
+  const signInBtn   = document.getElementById('signInBtn');
+  const indicator   = document.getElementById('authIndicator');
+  const email2      = document.getElementById('authEmail2');
+  const banner      = document.getElementById('viewOnlyBanner');
+  const viewMsg     = document.getElementById('viewOnlyMsg');
+
+  if (sessionEmail) {
+    signInBtn.style.display  = 'none';
+    indicator.style.display  = 'flex';
+    email2.textContent       = sessionEmail;
+
+    if (!sessionAllowed) {
+      banner.style.display = 'flex';
+      viewMsg.textContent  = `${sessionEmail} is not on the reviewer list`;
+    } else {
+      banner.style.display = 'none';
+    }
+  } else {
+    signInBtn.style.display  = 'block';
+    indicator.style.display  = 'none';
+    banner.style.display     = 'none';
+  }
+}
+
+// ── REVIEW FORM ───────────────────────────────────────────────────────────────
+function setRating(val) {
+  currentRating = val;
+  renderStars(val);
+}
+
+function renderStars(val) {
+  document.querySelectorAll('.star-btn').forEach(btn => {
+    btn.classList.toggle('active', parseInt(btn.dataset.val) <= val);
+  });
+}
+
+function setStatus(val) {
+  currentStatus = currentStatus === val ? '' : val;
+  renderStatusBtns(currentStatus);
+}
+
+function renderStatusBtns(val) {
+  document.querySelectorAll('.status-choice').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent.includes(val) && val !== '');
+  });
+}
+
+function submitReview() {
+  // Must be signed in and whitelisted
+  if (!sessionEmail) { openAuthModal(() => submitReview()); return; }
+  if (!sessionAllowed) { showToast('Your email is not authorised to submit feedback'); return; }
+
+  const comment  = document.getElementById('feedbackText').value.trim();
+  const reviewer = document.getElementById('reviewerName').value.trim();
+
+  if (!currentRating) { showToast('Please give a star rating first'); return; }
+  if (!reviewer)       { showToast('Please enter your name'); return; }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true; btn.textContent = 'Saving…';
+
+  feedback[currentTalent.talent_id] = {
+    rating: currentRating, status: currentStatus,
+    comment, reviewer, email: sessionEmail,
+    role: feedback[currentTalent.talent_id]?.role || '',
+  };
+  localStorage.setItem('vth_feedback', JSON.stringify(feedback));
+
+  const payload = {
+    timestamp:      new Date().toISOString(),
+    talent_id:      currentTalent.talent_id,
+    uuid:           currentTalent.uuid  || '',
+    vt_id:          currentTalent.vt_id || '',
+    language:       currentTalent.language,
+    role:           feedback[currentTalent.talent_id]?.role || '',
+    reviewer_name:  reviewer,
+    reviewer_email: sessionEmail,
+    rating:         currentRating,
+    status:         currentStatus,
+    comment,
+  };
+
+  fetch(SCRIPT_URL, {
+    method: 'POST', mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  })
+  .then(() => onSaveSuccess(btn))
+  .catch(() => onSaveSuccess(btn));
+}
+
+function onSaveSuccess(btn) {
+  renderStats(); renderProgress(); renderLangGrid(); renderRoster();
+
+  if (currentStatus === 'Approved') {
+    // Transition to Step 2 — role picker
+    btn.disabled = false; btn.textContent = 'Save Feedback';
+    document.getElementById('successMsg').style.display = 'none';
+
+    // Animate the swap
+    const step1 = document.getElementById('reviewModal').querySelector('.modal-body:not(#roleStep)');
+    const step2 = document.getElementById('roleStep');
+
+    step1.style.transition = 'opacity 0.2s';
+    step1.style.opacity = '0';
+    setTimeout(() => {
+      step1.style.display = 'none';
+      step1.style.opacity = '';
+      step1.style.transition = '';
+      // Reset role button selection
+      document.getElementById('rolePickLicensed').classList.remove('selected-licensed');
+      document.getElementById('rolePickSupporting').classList.remove('selected-supporting');
+      step2.style.display = 'block';
+      step2.style.opacity = '0';
+      step2.style.transition = 'opacity 0.2s';
+      requestAnimationFrame(() => { step2.style.opacity = '1'; });
+      setTimeout(() => { step2.style.transition = ''; }, 250);
+    }, 220);
+  } else {
+    // Non-Approved: show success and close
+    document.getElementById('successMsg').style.display = 'flex';
+    btn.textContent = '✓ Saved';
+    setTimeout(() => {
+      btn.disabled = false; btn.textContent = 'Save Feedback';
+      closeModal();
+    }, 1400);
+  }
+}
+
+function assignRole(role) {
+  // Highlight selection
+  document.getElementById('rolePickLicensed').classList.remove('selected-licensed','selected-supporting');
+  document.getElementById('rolePickSupporting').classList.remove('selected-licensed','selected-supporting');
+  document.getElementById(`rolePick${role}`).classList.add(`selected-${role.toLowerCase()}`);
+
+  // Save role to local feedback store
+  if (feedback[currentTalent.talent_id]) {
+    feedback[currentTalent.talent_id].role = role;
+    localStorage.setItem('vth_feedback', JSON.stringify(feedback));
+  }
+
+  // Also update the talent's role in the talents array so table refreshes correctly
+  const t = talents.find(t => t.talent_id === currentTalent.talent_id);
+  if (t) t.role = role;
+
+  // Send role update to sheet
+  const payload = {
+    timestamp:    new Date().toISOString(),
+    talent_id:    currentTalent.talent_id,
+    uuid:         currentTalent.uuid  || '',
+    vt_id:        currentTalent.vt_id || '',
+    language:     currentTalent.language,
+    role:         role,
+    reviewer_name:  feedback[currentTalent.talent_id]?.reviewer || '',
+    reviewer_email: sessionEmail,
+    rating:       feedback[currentTalent.talent_id]?.rating   || '',
+    status:       'Approved',
+    comment:      feedback[currentTalent.talent_id]?.comment  || '',
+    role_assigned:true,
+  };
+  if (SCRIPT_URL) {
+    fetch(SCRIPT_URL, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
+  }
+
+  renderStats(); renderProgress(); renderLangGrid(); renderRoster();
+
+  // Brief confirmation then close
+  const step2 = document.getElementById('roleStep');
+  const header = step2.querySelector('.role-step-header div:last-child div:first-child');
+  if (header) header.textContent = `Role assigned: ${role}`;
+
+  setTimeout(() => closeModal(), 900);
+}
+
+function skipRole() {
+  closeModal();
+}
+
+// ── FILTERS ───────────────────────────────────────────────────────────────────
+function filterLang(lang, btn) {
+  activeLang = lang;
+  document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+  if (btn) { btn.classList.add('active'); }
+  else {
+    document.querySelectorAll('.filter-pill').forEach(p => {
+      if ((lang === 'all' && p.textContent === 'All') || p.textContent === lang)
+        p.classList.add('active');
+    });
+  }
+  renderRoster();
+}
+
+function applySearch() {
+  activeSearch = document.getElementById('searchInput').value.trim();
+  renderRoster();
+}
+
+// ── TABS ──────────────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  document.getElementById('tabDashboard').style.display = tab === 'dashboard' ? '' : 'none';
+  document.getElementById('tabRoster').style.display    = tab === 'roster'    ? '' : 'none';
+  document.getElementById('navDashboard').classList.toggle('active', tab === 'dashboard');
+  document.getElementById('navRoster').classList.toggle('active',    tab === 'roster');
+}
+
+// ── DARK/LIGHT ────────────────────────────────────────────────────────────────
+function toggleMode() {
+  document.body.classList.toggle('light');
+  const isLight = document.body.classList.contains('light');
+  document.getElementById('modeIcon').textContent  = isLight ? '◑' : '☀';
+  document.getElementById('modeLabel').textContent = isLight ? 'Dark mode' : 'Light mode';
+}
+
+// ── ADMIN ─────────────────────────────────────────────────────────────────────
+
+
+// Keyboard shortcut
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeModal(); closeAuthModal(); }
+});
+
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
