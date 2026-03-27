@@ -6,7 +6,6 @@
 <title>Voice Talent Review — Foreground Recordings</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75'>🎙️</text></svg>" />
 <style>
 /* ── RESET & VARIABLES ───────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -545,6 +544,7 @@ tbody td { padding: 14px 16px; font-size: 13px; vertical-align: middle; }
   font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700;
   color: var(--text); display: flex; align-items: center; gap: 10px;
 }
+.loading-bar-wrap {
   width: 200px; height: 2px; background: var(--border); border-radius: 1px; overflow: hidden;
 }
 .loading-bar {
@@ -849,7 +849,7 @@ tbody tr { animation: row-in 0.3s ease both; }
       </div>
     </div>
     <div class="modal-body" style="padding-top:18px">
-      <div class="section-label" style="margin-bottom:8px;color:var(--text)">Your email</div>
+      <div class="section-label" style="margin-bottom:8px">Your email</div>
       <input type="email" class="reviewer-input" id="authEmail" placeholder="you@example.com"
         style="margin-bottom:6px" onkeydown="if(event.key==='Enter')submitAuth()"/>
       <div id="authError" style="font-size:12px;color:#f87171;min-height:18px;margin-bottom:14px;display:none"></div>
@@ -878,7 +878,12 @@ tbody tr { animation: row-in 0.3s ease both; }
 // NOTE: This is soft auth suitable for an internal client tool.
 // The script URL is visible in source — this prevents accidental edits,
 // not a determined bad actor. Keep the sheet itself access-controlled in Drive.
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyFdGIbkYz1AqVDmIp5F6vo4lXGcXkIw2PbTDNePDvbr9_YCI4bAk2RiLcYO43p7bNKeA/exec"; // ← paste your GAS web app URL
+const SCRIPT_URL   = "https://script.google.com/macros/s/AKfycbyFdGIbkYz1AqVDmIp5F6vo4lXGcXkIw2PbTDNePDvbr9_YCI4bAk2RiLcYO43p7bNKeA/exec"; // ← your GAS web app URL
+
+// Base URL for audio files in the GitHub repo /audio/ folder.
+// Example: "https://raw.githubusercontent.com/your-org/your-repo/main/audio"
+// Change YOUR_ORG and YOUR_REPO — trailing slash NOT needed.
+const AUDIO_BASE_URL = "https://raw.githubusercontent.com/invisible-tech/candidate-hub_foreground-recordings/main/audio";
 
 // ── STATE ─────────────────────────────────────────────────────────────────────
 let talents       = [];
@@ -1132,15 +1137,19 @@ function renderRoster() {
 
 // ── AUDIO ─────────────────────────────────────────────────────────────────────
 function getAudioUrl(t) {
+  // Full URL override — use as-is
   if (t.recording && t.recording.startsWith('http')) return t.recording;
-  if (t.drive_file_id) return `https://drive.google.com/file/d/${t.drive_file_id}/preview`;
-  if (t.recording) return `https://drive.google.com/file/d/${t.recording}/preview`;
-  return '';
+  // Filename stored in sheet → build GitHub raw URL
+  const file = t.recording || t.drive_file_id || '';
+  if (!file) return '';
+  // Strip any path prefix just in case
+  const filename = file.split('/').pop();
+  return `${AUDIO_BASE_URL}/${filename}`;
 }
+
 function getDownloadUrl(t) {
-  if (t.drive_file_id) return `https://drive.google.com/uc?export=download&id=${t.drive_file_id}`;
-  if (t.recording && !t.recording.startsWith('http')) return `https://drive.google.com/uc?export=download&id=${t.recording}`;
-  return t.recording || '';
+  // Same URL works for download (raw GitHub serves with correct headers)
+  return getAudioUrl(t);
 }
 
 function fmtTime(sec) {
@@ -1169,7 +1178,7 @@ function miniPlay(id, url) {
   audio.src = url;
   audio.play().then(() => {
     btn.classList.add('playing'); btn.innerHTML = '⏸';
-  }).catch(() => showToast('Audio unavailable — check Drive sharing settings'));
+  }).catch(() => showToast('Audio unavailable — check the file exists in the /audio/ folder'));
   audio.onended = () => { btn.classList.remove('playing'); btn.innerHTML = '▶'; activeRow = null; };
 }
 
@@ -1280,7 +1289,7 @@ function togglePlay() {
   }
   if (audio.paused) {
     audio.play().then(()=>{btn.innerHTML='⏸';btn.classList.add('playing');})
-      .catch(()=>showToast('Could not play — check Drive sharing settings'));
+      .catch(()=>showToast('Could not play — check the file exists in /audio/ folder'));
   } else {
     audio.pause(); btn.innerHTML='▶'; btn.classList.remove('playing');
   }
