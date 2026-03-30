@@ -204,6 +204,9 @@ main { position: relative; z-index: 1; padding: 32px; max-width: 1200px; margin:
   font-size: 11px; font-weight: 600; text-transform: uppercase;
   letter-spacing: 0.8px; color: var(--text2);
 }
+.stat-card-sm { padding: 14px 18px; opacity: 0.75; }
+.stat-card-sm:hover { opacity: 1; }
+.stat-num-sm { font-size: 22px; }
 
 /* ── FILTER BAR ───────────────────────────────────────────── */
 .filter-bar {
@@ -706,23 +709,8 @@ tbody tr { animation: row-in 0.3s ease both; }
       </div>
     </div>
 
-    <div class="stats-grid" id="statsGrid">
-      <div class="stat-card">
-        <div class="stat-num" id="statTotal">—</div>
-        <div class="stat-label">Total Candidates</div>
-      </div>
-      <div class="stat-card" style="--accent:#f59e0b">
-        <div class="stat-num" id="statPending">—</div>
-        <div class="stat-label">Pending Review</div>
-      </div>
-      <div class="stat-card" style="--accent:#34d399">
-        <div class="stat-num" id="statFinalist">—</div>
-        <div class="stat-label">Finalists</div>
-      </div>
-      <div class="stat-card" style="--accent:#E8407A">
-        <div class="stat-num" id="statRated">—</div>
-        <div class="stat-label">Reviewed</div>
-      </div>
+    <!-- Primary stats row -->
+    <div class="stats-grid" id="statsGrid" style="margin-bottom:10px">
       <div class="stat-card" style="--accent:var(--lime)">
         <div class="stat-num" id="statLicensed">—</div>
         <div class="stat-label">Licensed Approved</div>
@@ -735,15 +723,29 @@ tbody tr { animation: row-in 0.3s ease both; }
         <div class="stat-num" id="statLangsDone">—</div>
         <div class="stat-label">Languages Complete</div>
       </div>
-      <div class="stat-card" style="--accent:#f87171">
-        <div class="stat-num" id="statRejected">—</div>
-        <div class="stat-label">Rejected</div>
+      <div class="stat-card" style="--accent:#f59e0b">
+        <div class="stat-num" id="statPending">—</div>
+        <div class="stat-label">Pending Review</div>
       </div>
     </div>
-
-    <div class="progress-section" id="progressSection">
-      <div class="progress-title">Review Progress by Language</div>
-      <div id="progressBars"></div>
+    <!-- Secondary stats row — smaller, muted -->
+    <div class="stats-grid stats-grid-secondary" id="statsGridSecondary" style="margin-bottom:24px">
+      <div class="stat-card stat-card-sm">
+        <div class="stat-num stat-num-sm" id="statTotal">—</div>
+        <div class="stat-label">Total Candidates</div>
+      </div>
+      <div class="stat-card stat-card-sm" style="--accent:#8a8a99">
+        <div class="stat-num stat-num-sm" id="statRated">—</div>
+        <div class="stat-label">Reviewed</div>
+      </div>
+      <div class="stat-card stat-card-sm" style="--accent:#f87171">
+        <div class="stat-num stat-num-sm" id="statRejected">—</div>
+        <div class="stat-label">Rejected</div>
+      </div>
+      <div class="stat-card stat-card-sm" style="--accent:#34d399">
+        <div class="stat-num stat-num-sm" id="statFinalist">—</div>
+        <div class="stat-label">Finalists</div>
+      </div>
     </div>
 
     <div class="progress-section">
@@ -768,6 +770,11 @@ tbody tr { animation: row-in 0.3s ease both; }
           <tbody id="selTableBody"></tbody>
         </table>
       </div>
+    </div>
+
+    <div class="progress-section" id="progressSection">
+      <div class="progress-title">Review Progress by Language</div>
+      <div id="progressBars"></div>
     </div>
   </div>
 
