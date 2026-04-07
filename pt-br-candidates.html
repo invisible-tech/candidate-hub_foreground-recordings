@@ -11,10 +11,6 @@
 /* ── RESET ───────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* ── CONFIG: swap these two blocks to change project ──────── */
-/* PROJECT: Voice Talent Review || PT-BR                       */
-/* SCRIPT_URL: set in JS CONFIG block below                    */
-
 /* ── VARIABLES — Jordan's Design System ─────────────────── */
 :root {
   --header-bg:  #0a5ecc;
@@ -605,11 +601,9 @@ tbody tr { animation: row-in 0.25s ease both; }
     </div>
     <button class="header-btn" id="signInBtn" onclick="openAuthModal()">Sign in</button>
     <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" title="Toggle dark mode">
-      <!-- Sun icon (shown in light mode) -->
       <svg id="iconSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
         <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
       </svg>
-      <!-- Moon icon (shown in dark mode) -->
       <svg id="iconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" style="display:none">
         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
       </svg>
@@ -648,12 +642,12 @@ tbody tr { animation: row-in 0.25s ease both; }
       </div>
     </div>
 
-
-
     <div class="section-card">
       <div class="section-card-title">Review Progress</div>
       <div id="progressBars"></div>
     </div>
+  </div>
+  <!-- ↑ END tabDashboard ↑ -->
 
   <!-- ── ROSTER TAB ───────────────────────────────────────── -->
   <div id="tabRoster" style="display:none">
@@ -697,6 +691,7 @@ tbody tr { animation: row-in 0.25s ease both; }
 
     <div class="mobile-cards" id="mobileCards"></div>
   </div>
+  <!-- ↑ END tabRoster ↑ -->
 
 </main>
 
@@ -713,7 +708,6 @@ tbody tr { animation: row-in 0.25s ease both; }
 
     <!-- Step 1: Review form -->
     <div class="modal-body" id="modalStep1">
-      <!-- Multi-track players — rendered dynamically by renderPlayers() -->
       <div class="players-wrap" id="playersWrap"></div>
       <audio id="audioEl" preload="none"></audio>
 
@@ -819,27 +813,23 @@ tbody tr { animation: row-in 0.25s ease both; }
 
 <script>
 /* ════════════════════════════════════════════════════════════
-   CONFIG — edit these lines to repurpose for a new project
+   CONFIG
    ════════════════════════════════════════════════════════════ */
 const CONFIG = {
   appName:        'Voice Talent Review · PT-BR',
   scriptUrl:      'https://script.google.com/macros/s/AKfycbyFdGIbkYz1AqVDmIp5F6vo4lXGcXkIw2PbTDNePDvbr9_YCI4bAk2RiLcYO43p7bNKeA/exec',
   audioBaseUrl:   'https://cdn.jsdelivr.net/gh/invisible-tech/candidate-hub@main/audio',
-  // Sheet tab names (passed as query params to GAS)
   tabs: {
     talents:       'PT_talents',
     feedback:      'PT_feedback',
     allowedEmails: 'PT_allowed_emails',
   },
-  // localStorage key for theme preference
   themeKey: 'vt-ptbr-theme',
 };
-/* ════════════════════════════════════════════════════════════ */
 
 /* ── STATE ────────────────────────────────────────────────── */
 let talents       = [];
 let feedback      = {};
-let selectionData = [];
 let currentTalent = null;
 let currentRating = 0;
 let currentStatus = '';
@@ -967,8 +957,8 @@ function renderStats() {
 function set(id, val) { const el=document.getElementById(id); if(el) el.textContent=val; }
 
 function renderProgress() {
-  const total = talents.length;
-  const rated = talents.filter(t=>feedback[t.talent_id]?.rating).length;
+  const total    = talents.length;
+  const rated    = talents.filter(t=>feedback[t.talent_id]?.rating).length;
   const approved = talents.filter(t=>feedback[t.talent_id]?.status==='Approved').length;
   const finalist = talents.filter(t=>feedback[t.talent_id]?.status==='Finalist').length;
   const rejected = talents.filter(t=>feedback[t.talent_id]?.status==='Rejected').length;
@@ -997,15 +987,6 @@ function renderProgress() {
       <div class="prog-track"><div class="prog-fill" style="width:${pct}%;background:${r.color}"></div></div>
     </div>`;
   }).join('');
-}
-
-function renderLangSelect() {}
-function renderSelTable() {}
-function statusClass(s) {
-  s=(s||'').toLowerCase();
-  if(s==='confirmed') return 'filled';
-  if(s==='pending')   return 'pending';
-  return 'searching';
 }
 
 function filtered() {
@@ -1100,15 +1081,12 @@ function renderRoster() {
 }
 
 /* ── AUDIO ────────────────────────────────────────────────── */
-
-// The three tracks, in display order
 const TRACKS = [
   { key: 'recording_en',    label: 'English Casting',    color: 'var(--accent)',  dot: '#4d8ef0' },
   { key: 'recording_pt',    label: 'Portuguese Casting', color: 'var(--teal)',    dot: '#00a896' },
   { key: 'recording_final', label: 'Final Casting',      color: 'var(--amber)',   dot: '#bf6000' },
 ];
 
-// Which track is currently loaded in the <audio> element
 let activeTrackKey = null;
 
 function fileToUrl(file) {
@@ -1123,11 +1101,8 @@ function fmtTime(s) {
   return `${m}:${sec.toString().padStart(2,'0')}`;
 }
 
-// Render all track cards into #playersWrap
 function renderPlayers(talent) {
   const wrap = document.getElementById('playersWrap');
-  const audio = document.getElementById('audioEl');
-
   wrap.innerHTML = TRACKS.map(track => {
     const url = fileToUrl(talent[track.key] || '');
     const hasAudio = !!url;
@@ -1169,19 +1144,12 @@ function trackPlay(key, url) {
   const btn   = document.getElementById(`pb-${key}`);
   if (!url) return;
 
-  // Same track — toggle play/pause
   if (activeTrackKey === key) {
-    if (audio.paused) {
-      audio.play();
-      btn.innerHTML = '⏸';
-    } else {
-      audio.pause();
-      btn.innerHTML = '▶';
-    }
+    if (audio.paused) { audio.play(); btn.innerHTML = '⏸'; }
+    else              { audio.pause(); btn.innerHTML = '▶'; }
     return;
   }
 
-  // Different track — stop current, load new
   stopAllTracks();
   activeTrackKey = key;
   audio.src = url;
@@ -1189,10 +1157,7 @@ function trackPlay(key, url) {
     .then(() => { btn.innerHTML = '⏸'; })
     .catch(() => showToast('Could not play — check file exists in /audio/'));
 
-  audio.onended = () => {
-    btn.innerHTML = '▶';
-    activeTrackKey = null;
-  };
+  audio.onended = () => { btn.innerHTML = '▶'; activeTrackKey = null; };
 }
 
 function stopAllTracks() {
@@ -1201,10 +1166,9 @@ function stopAllTracks() {
   if (activeTrackKey) {
     const prev = document.getElementById(`pb-${activeTrackKey}`);
     if (prev) prev.innerHTML = '▶';
-    // Reset progress on the previously active track
-    const fill = document.getElementById(`pfill-${activeTrackKey}`);
+    const fill    = document.getElementById(`pfill-${activeTrackKey}`);
     const elapsed = document.getElementById(`pt-elapsed-${activeTrackKey}`);
-    if (fill) fill.style.width = '0%';
+    if (fill)    fill.style.width = '0%';
     if (elapsed) elapsed.textContent = '0:00';
     activeTrackKey = null;
   }
@@ -1218,7 +1182,6 @@ function trackScrub(e, key) {
   audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
 }
 
-// Also used by the roster mini-play buttons
 function miniPlay(id, url) {
   const audio = document.getElementById('audioEl');
   const btn   = document.getElementById(`mp-${id}`);
@@ -1240,11 +1203,10 @@ function miniPlay(id, url) {
   audio.onended = () => { btn.classList.remove('playing'); btn.innerHTML = '▶'; activePlayId = null; };
 }
 
-// Single audio element — update whichever track is active
 const audioEl = document.getElementById('audioEl');
 audioEl.addEventListener('timeupdate', () => {
   if (!activeTrackKey || !audioEl.duration) return;
-  const pct = audioEl.currentTime / audioEl.duration * 100;
+  const pct     = audioEl.currentTime / audioEl.duration * 100;
   const fill    = document.getElementById(`pfill-${activeTrackKey}`);
   const elapsed = document.getElementById(`pt-elapsed-${activeTrackKey}`);
   const dur     = document.getElementById(`pt-dur-${activeTrackKey}`);
@@ -1281,9 +1243,7 @@ function openModal(id) {
   document.getElementById('modalTitle').textContent = title;
   document.getElementById('modalMeta').textContent  = `${currentTalent.language} · ${roleLbl}${currentTalent.bio?'  —  '+currentTalent.bio:''}`;
 
-  // Render multi-track players
   renderPlayers(currentTalent);
-
   renderStars(currentRating);
   renderStatusBtns(currentStatus);
   document.getElementById('feedbackText').value=fb.comment||'';
@@ -1497,26 +1457,26 @@ function filterStatus(s,btn) {
   if(btn)btn.classList.add('active');
   renderRoster();
 }
-function applySearch() {activeSearch=document.getElementById('searchInput').value.trim();renderRoster();}
+function applySearch() { activeSearch=document.getElementById('searchInput').value.trim(); renderRoster(); }
 
 /* ── TABS ─────────────────────────────────────────────────── */
 function switchTab(tab) {
-  document.getElementById('tabDashboard').style.display=tab==='dashboard'?'':'none';
-  document.getElementById('tabRoster').style.display   =tab==='roster'?'':'none';
-  document.getElementById('navDashboard').classList.toggle('active',tab==='dashboard');
-  document.getElementById('navRoster').classList.toggle('active',tab==='roster');
+  document.getElementById('tabDashboard').style.display = tab==='dashboard' ? '' : 'none';
+  document.getElementById('tabRoster').style.display    = tab==='roster'    ? '' : 'none';
+  document.getElementById('navDashboard').classList.toggle('active', tab==='dashboard');
+  document.getElementById('navRoster').classList.toggle('active',    tab==='roster');
 }
 
 /* ── KEYBOARD ─────────────────────────────────────────────── */
-document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){closeModal();closeAuthModal();}
+document.addEventListener('keydown', e => {
+  if (e.key==='Escape') { closeModal(); closeAuthModal(); }
 });
 
 /* ── TOAST ────────────────────────────────────────────────── */
-function showToast(msg){
+function showToast(msg) {
   const t=document.getElementById('toast');
   t.textContent=msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),3000);
+  setTimeout(()=>t.classList.remove('show'), 3000);
 }
 </script>
 </body>
